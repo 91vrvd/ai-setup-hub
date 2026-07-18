@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { promisify } from "node:util";
 import test from "node:test";
+
+const execFileAsync = promisify(execFile);
 
 async function render() {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
@@ -45,4 +52,24 @@ test("removes the account stack and keeps downloads public", async () => {
 
   await assert.rejects(access(new URL("../app/auth-panel.tsx", import.meta.url)));
   await assert.rejects(access(new URL("../app/supabase.ts", import.meta.url)));
+});
+
+test("packages PowerShell scripts for Windows PowerShell 5.1", async () => {
+  const temp = await mkdtemp(join(tmpdir(), "ai-setup-hub-"));
+  const target = join(temp, "Install-AI-Tools.ps1");
+
+  try {
+    await execFileAsync(process.execPath, [
+      new URL("../scripts/write-windows-powershell.mjs", import.meta.url).pathname,
+      new URL("../installer/windows/Install-AI-Tools.ps1", import.meta.url).pathname,
+      target,
+    ]);
+
+    const output = await readFile(target);
+    assert.deepEqual([...output.subarray(0, 3)], [0xef, 0xbb, 0xbf]);
+    assert.match(output.toString("utf8"), /\r\n\s*\$CcLink = "ccswitch:\/\/v1\/import\?/);
+    assert.doesNotMatch(output.toString("utf8").replaceAll("\r\n", ""), /\n/);
+  } finally {
+    await rm(temp, { recursive: true, force: true });
+  }
 });

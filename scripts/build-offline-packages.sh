@@ -15,6 +15,10 @@ fetch() {
   [[ "$(shasum -a 256 "$target" | awk '{print $1}')" == "$sha" ]] || { echo "Checksum failed: $target" >&2; exit 1; }
 }
 
+write_windows_powershell() {
+  node "$ROOT/scripts/write-windows-powershell.mjs" "$1" "$2"
+}
+
 package_mac() {
   local key="$1" arch="$2" asset="$3" sha="$4" url="$5" label="$6"
   local stage="$ROOT/work/package-$key"
@@ -32,7 +36,7 @@ package_windows() {
   local key="$1" arch="$2" asset="$3" sha="$4" url="$5" label="$6"
   local stage="$ROOT/work/package-$key"
   mkdir -p "$stage"
-  cp "$ROOT/installer/windows/Install-Clash.ps1" "$stage/Install-Clash.ps1"
+  write_windows_powershell "$ROOT/installer/windows/Install-Clash.ps1" "$stage/Install-Clash.ps1"
   perl -0pi -e "s/__EXPECTED_ARCH__/$arch/g; s/__INSTALLER_NAME__/$asset/g; s/__EXPECTED_SHA__/$sha/g" "$stage/Install-Clash.ps1"
   cp "$ROOT/installer/windows/Start-Clash-Setup.bat" "$stage/双击安装-Clash.bat"
   fetch "$url" "$CACHE/$asset" "$sha"
@@ -50,7 +54,7 @@ cp "$ROOT/installer/macos/Install-AI-Tools.command" "$OUTPUT/AI-Setup-Hub-macOS.
 chmod +x "$OUTPUT/AI-Setup-Hub-macOS.command"
 WINDOWS_STAGE="$ROOT/work/package-ai-windows"
 mkdir -p "$WINDOWS_STAGE"
-cp "$ROOT/installer/windows/Install-AI-Tools.ps1" "$WINDOWS_STAGE/Install-AI-Tools.ps1"
+write_windows_powershell "$ROOT/installer/windows/Install-AI-Tools.ps1" "$WINDOWS_STAGE/Install-AI-Tools.ps1"
 cp "$ROOT/installer/windows/Start-AI-Setup.bat" "$WINDOWS_STAGE/双击安装-AI工具.bat"
 (cd "$WINDOWS_STAGE" && zip -qry "$OUTPUT/AI-Setup-Hub-Windows.zip" .)
 
