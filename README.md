@@ -1,6 +1,6 @@
 # AI Setup Hub
 
-面向新电脑的开源安装入口：先用离线包安装 Clash Verge Rev，联网后再安装 CC Switch、Codex 和 OpenClaw。
+面向新电脑的开源安装入口：网络不通时可先用离线包安装 Clash Verge Rev；网络已经正常时，可跳过 Clash，直接安装 CC Switch、Codex 和 OpenClaw。所有下载均无需登录。
 
 ## 支持范围
 

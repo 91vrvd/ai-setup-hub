@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AuthPanel } from "./auth-panel";
 
 type Platform = "mac-arm64" | "mac-x64" | "win-x64" | "win-arm64";
 
@@ -39,6 +38,9 @@ export function SetupHub() {
   }, []);
 
   const selectedInfo = useMemo(() => platforms[selected], [selected]);
+  const aiToolsAsset = selected.startsWith("mac")
+    ? { label: "macOS", detail: "Apple 芯片 / Intel 自动识别", file: "AI-Setup-Hub-macOS.command" }
+    : { label: "Windows 10 / 11", detail: "x64 / ARM64 自动识别", file: "AI-Setup-Hub-Windows.zip" };
 
   function beginDownload() {
     setNotice(`正在获取 ${selectedInfo.label} 离线包…`);
@@ -57,7 +59,7 @@ export function SetupHub() {
           <a href="#flow">安装流程</a>
           <a href="#software">包含软件</a>
           <a href="#security">安全说明</a>
-          <a href="#account">GitHub 登录</a>
+          <a href="#ai-tools">直接装 AI</a>
           <a className="github-link" href={repo} target="_blank" rel="noreferrer">GitHub 开源 ↗</a>
         </div>
         <button className="menu-button" onClick={() => setMenuOpen((value) => !value)} aria-expanded={menuOpen}>菜单</button>
@@ -68,16 +70,17 @@ export function SetupHub() {
         <div className="hero-copy">
           <div className="eyebrow"><span className="pulse" /> 新电脑，不再从零折腾</div>
           <h1>先恢复网络，<br /><span>再一次装好 AI。</span></h1>
-          <p className="hero-lead">一个公开透明的装机助手。离线安装 Clash Verge Rev，联网后自动安装 CC Switch、Codex 和 OpenClaw。</p>
+          <p className="hero-lead">一个公开透明的装机助手。网络不通时先离线安装 Clash Verge Rev；网络已经正常，就直接安装 CC Switch、Codex 和 OpenClaw。</p>
           <div className="trust-row">
             <span>✓ Key 只留本机</span><span>✓ 官方安装包</span><span>✓ SHA-256 校验</span>
           </div>
         </div>
 
         <aside className="download-card" aria-labelledby="download-title">
-          <div className="card-topline"><span>01</span><span>离线网络救援包</span></div>
-          <h2 id="download-title">选择你的电脑</h2>
+          <div className="card-topline"><span>01</span><span>网络不通时才需要</span></div>
+          <h2 id="download-title">需要安装 Clash？</h2>
           <p>下载包内已包含 Clash Verge Rev，不依赖新电脑提前访问 GitHub。</p>
+          <a className="skip-clash" href="#ai-tools"><span><b>网络已经正常</b><small>无需下载 Clash，直接安装 AI 工具</small></span><em>跳过 →</em></a>
           <div className="platform-grid">
             {(Object.entries(platforms) as [Platform, (typeof platforms)[Platform]][]).map(([key, item]) => (
               <button key={key} onClick={() => setSelected(key)} className={`platform-option ${selected === key ? "selected" : ""}`} aria-pressed={selected === key}>
@@ -95,16 +98,33 @@ export function SetupHub() {
 
       <section className="flow-section" id="flow">
         <div className="shell">
-          <div className="section-heading"><span>HOW IT WORKS</span><h2>两段式安装，卡点更少</h2><p>网络工具放在离线包里，AI 工具等网络恢复后再安装。</p></div>
+          <div className="section-heading"><span>HOW IT WORKS</span><h2>根据网络状态，选择入口</h2><p>网络不通先用离线包；网络已经正常，第一步可以直接跳过。</p></div>
           <div className="flow-grid">
-            <article><div className="step-number">1</div><span className="step-tag offline">离线完成</span><h3>恢复网络</h3><p>解压并双击安装助手，确认一次系统权限。随后导入订阅链接或 YAML 文件。</p><ul><li>内置对应架构安装包</li><li>校验文件完整性</li><li>打开 Clash 配置页面</li></ul></article>
+            <article><div className="step-number">1</div><span className="step-tag offline">网络正常可跳过</span><h3>需要时恢复网络</h3><p>只有新电脑无法正常联网时，才需要解压并运行 Clash 离线安装助手。</p><ul><li>内置对应架构安装包</li><li>校验文件完整性</li><li>支持订阅链接或 YAML</li></ul></article>
             <div className="flow-arrow" aria-hidden="true">→</div>
-            <article><div className="step-number">2</div><span className="step-tag online">联网完成</span><h3>安装 AI 工具</h3><p>网络恢复后运行完整助手。已有配置会先备份，失败时可以恢复。</p><ul><li>安装 CC Switch 与 Codex</li><li>安装并启动 OpenClaw</li><li>本机填写 DeepSeek Key</li></ul></article>
+            <article><div className="step-number">2</div><span className="step-tag online">无需登录</span><h3>直接安装 AI 工具</h3><p>只要网络已经正常，就能直接下载安装助手。已有配置会先备份。</p><ul><li>安装 CC Switch 与 Codex</li><li>安装并启动 OpenClaw</li><li>本机填写 DeepSeek Key</li></ul></article>
           </div>
         </div>
       </section>
 
-      <AuthPanel />
+      <section className="direct-setup shell" id="ai-tools">
+        <div className="direct-copy">
+          <span className="account-kicker">02 · 完整安装助手</span>
+          <h2>网络正常？<br />从这里直接开始。</h2>
+          <p>不需要账户，不需要 GitHub 登录。选择对应系统，下载后双击运行即可。Codex 只安装官方版本，不会修改你的登录和模型配置。</p>
+          <div className="open-access"><span /> 公开下载 · 无账户限制</div>
+        </div>
+        <div className="direct-card">
+          <div className="member-head"><div><small>DIRECT DOWNLOAD</small><h3>选择完整 AI 安装助手</h3></div><span>无需登录</span></div>
+          <a className={`asset-link ${aiToolsAsset.label === "macOS" ? "recommended" : ""}`} href={`${releaseBase}/AI-Setup-Hub-macOS.command`}>
+            <span><b>macOS</b><small>Apple 芯片 / Intel 自动识别</small></span><em>{aiToolsAsset.label === "macOS" ? "为你推荐 · " : ""}下载 ↓</em>
+          </a>
+          <a className={`asset-link ${aiToolsAsset.label.startsWith("Windows") ? "recommended" : ""}`} href={`${releaseBase}/AI-Setup-Hub-Windows.zip`}>
+            <span><b>Windows 10 / 11</b><small>x64 / ARM64 自动识别</small></span><em>{aiToolsAsset.label.startsWith("Windows") ? "为你推荐 · " : ""}下载 ↓</em>
+          </a>
+          <div className="direct-note"><b>将会安装</b><span>CC Switch · Codex · OpenClaw</span><small>运行时再在本机填写 DeepSeek Key，网站不会收到 Key。</small></div>
+        </div>
+      </section>
 
       <section className="software shell" id="software">
         <div className="section-heading left"><span>WHAT YOU GET</span><h2>四个工具，各就各位</h2></div>
