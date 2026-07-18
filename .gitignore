@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.vinext/
+.wrangler/
+dist/
+release-assets/
+work/
+.env
+.env.local
+.DS_Store
+*.log
