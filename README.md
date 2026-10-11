@@ -1,6 +1,8 @@
-# AI Setup Hub
+# 新电脑配置助手 / AI Setup Hub
 
 面向新电脑的开源安装入口：网络不通时可先用离线包安装 Clash Verge Rev；网络已经正常时，可跳过 Clash，直接安装 CC Switch、Codex 和 OpenClaw。所有下载均无需登录。
+
+**English:** A setup page for a new Mac or Windows PC. It links the installation steps for Clash Verge Rev, CC Switch, Codex, and OpenClaw, with offline packages for the first step.
 
 ## 支持范围
 
