@@ -58,5 +58,6 @@ write_windows_powershell "$ROOT/installer/windows/Install-AI-Tools.ps1" "$WINDOW
 cp "$ROOT/installer/windows/Start-AI-Setup.bat" "$WINDOWS_STAGE/双击安装-AI工具.bat"
 (cd "$WINDOWS_STAGE" && zip -qry "$OUTPUT/AI-Setup-Hub-Windows.zip" .)
 
-shasum -a 256 "$OUTPUT"/*.zip > "$OUTPUT/SHA256SUMS.txt"
+# Relative names so `shasum -a 256 -c SHA256SUMS.txt` works after download.
+(cd "$OUTPUT" && shasum -a 256 ./*.zip ./*.command | sed 's#  \./#  #' > SHA256SUMS.txt)
 echo "Offline packages created in $OUTPUT"
